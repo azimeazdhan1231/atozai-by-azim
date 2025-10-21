@@ -28,7 +28,7 @@ export function ToolCard({ tool }: ToolCardProps) {
               <Sparkles className="h-6 w-6 text-primary" />
             </div>
             <div className="flex-1 min-w-0">
-              <CardTitle className="text-lg line-clamp-1 group-hover:text-primary transition-colors">
+              <CardTitle className="text-lg line-clamp-1 group-hover:text-primary transition-colors break-words">
                 {tool.name}
               </CardTitle>
             </div>
@@ -41,7 +41,7 @@ export function ToolCard({ tool }: ToolCardProps) {
             {tool.pricing}
           </Badge>
         </div>
-        <CardDescription className="line-clamp-2 text-sm">
+        <CardDescription className="line-clamp-2 text-sm break-words overflow-hidden">
           {tool.short_description}
         </CardDescription>
       </CardHeader>

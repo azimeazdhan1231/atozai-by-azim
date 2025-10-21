@@ -138,7 +138,7 @@ export default function ToolDetail() {
               <CardContent className="space-y-6">
                 <div>
                   <h3 className="text-xl font-semibold mb-3">Description</h3>
-                  <p className="text-muted-foreground leading-relaxed" data-testid="text-description">
+                  <p className="text-muted-foreground leading-relaxed break-words overflow-wrap-anywhere" data-testid="text-description">
                     {tool.description}
                   </p>
                 </div>
