@@ -18,7 +18,7 @@ This guide will help you deploy the AtoZAI directory to Netlify.
 2. **Configure Build Settings**
    - Build command: `npm run build`
    - Publish directory: `dist/public`
-   - Functions directory: `netlify/functions`
+   - Functions directory: `dist/netlify/functions`
    
    These are already configured in `netlify.toml`, so Netlify will detect them automatically.
 
@@ -26,6 +26,11 @@ This guide will help you deploy the AtoZAI directory to Netlify.
    - Click "Deploy site"
    - Wait for the build to complete (usually 2-3 minutes)
    - Your site will be live at `https://your-site-name.netlify.app`
+
+**IMPORTANT:** Do NOT use drag-and-drop deployment. You MUST deploy via Git connection so that:
+- The build command runs and compiles the Netlify Functions
+- The data files are copied to the correct location
+- All dependencies are properly installed
 
 ### Option 2: Deploy via Netlify CLI
 

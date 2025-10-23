@@ -1,6 +1,8 @@
-import type { Handler, HandlerEvent, HandlerContext } from "@netlify/functions";
-import toolsData from "../../server/data/tools.json";
-import categoriesData from "../../server/data/categories.json";
+
+import { Handler } from '@netlify/functions';
+import { readFileSync } from 'fs';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
 
 interface Tool {
   id: number;
@@ -9,97 +11,87 @@ interface Tool {
   url: string;
   short_description: string;
   description: string;
-  pricing: 'Free' | 'Paid' | 'Freemium';
+  pricing: string;
   primary_category: string;
   secondary_category: string;
   platform_type: string;
 }
 
-const tools: Tool[] = toolsData as Tool[];
+interface Categories {
+  primary: string[];
+  secondary: string[];
+  pricing: string[];
+  platform: string[];
+}
 
-export const handler: Handler = async (event: HandlerEvent, context: HandlerContext) => {
+// Load data from JSON files
+let tools: Tool[] = [];
+let categories: Categories = { primary: [], secondary: [], pricing: [], platform: [] };
+
+try {
+  // Try different paths for data files
+  const possiblePaths = [
+    join(process.cwd(), 'server/data/tools.json'),
+    join(process.cwd(), 'data/tools.json'),
+    join(process.cwd(), '../../server/data/tools.json'),
+  ];
+
+  let toolsPath = '';
+  for (const path of possiblePaths) {
+    try {
+      readFileSync(path);
+      toolsPath = path;
+      break;
+    } catch {
+      continue;
+    }
+  }
+
+  if (toolsPath) {
+    tools = JSON.parse(readFileSync(toolsPath, 'utf-8'));
+    const categoriesPath = toolsPath.replace('tools.json', 'categories.json');
+    categories = JSON.parse(readFileSync(categoriesPath, 'utf-8'));
+  }
+} catch (error) {
+  console.error('Error loading data files:', error);
+}
+
+export const handler: Handler = async (event) => {
+  const path = event.path.replace('/.netlify/functions/tools', '');
+  
+  // CORS headers
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Methods': 'GET, OPTIONS',
     'Content-Type': 'application/json',
   };
 
-  // Handle preflight
+  // Handle OPTIONS request
   if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 200, headers, body: '' };
+    return {
+      statusCode: 200,
+      headers,
+      body: '',
+    };
   }
 
-  const path = event.path.replace('/.netlify/functions/tools', '');
-  const url = new URL(event.rawUrl);
-  const searchParams = url.searchParams;
-
   try {
-    // GET /api/tools - List all tools with filtering and pagination
-    if (path === '' || path === '/') {
-      const search = searchParams.get('search')?.toLowerCase() || '';
-      const pricingFilter = searchParams.getAll('pricing');
-      const primaryCategory = searchParams.get('primary_category');
-      const page = parseInt(searchParams.get('page') || '1');
-      const limit = parseInt(searchParams.get('limit') || '24');
-
-      let filtered = tools;
-
-      // Apply search filter
-      if (search) {
-        filtered = filtered.filter(tool =>
-          tool.name.toLowerCase().includes(search) ||
-          tool.short_description.toLowerCase().includes(search) ||
-          tool.description.toLowerCase().includes(search) ||
-          tool.primary_category.toLowerCase().includes(search) ||
-          tool.secondary_category.toLowerCase().includes(search)
-        );
-      }
-
-      // Apply pricing filter
-      if (pricingFilter.length > 0) {
-        filtered = filtered.filter(tool => pricingFilter.includes(tool.pricing));
-      }
-
-      // Apply category filter
-      if (primaryCategory) {
-        filtered = filtered.filter(tool => tool.primary_category === primaryCategory);
-      }
-
-      const total = filtered.length;
-      const totalPages = Math.ceil(total / limit);
-      const start = (page - 1) * limit;
-      const end = start + limit;
-      const paginatedTools = filtered.slice(start, end);
-
+    // GET /api/categories
+    if (path === '/categories' || path === '' && event.queryStringParameters?.endpoint === 'categories') {
       return {
         statusCode: 200,
         headers,
-        body: JSON.stringify({
-          tools: paginatedTools,
-          total,
-          page,
-          totalPages,
-          hasMore: page < totalPages,
-        }),
+        body: JSON.stringify(categories),
       };
     }
 
-    // GET /api/categories - Get all categories
-    if (path === '/categories') {
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify(categoriesData),
-      };
-    }
-
-    // GET /api/tools/:slug - Get single tool by slug
-    const slugMatch = path.match(/^\/([^/]+)$/);
+    // GET /api/tools/:slug (single tool)
+    const slugMatch = path.match(/^\/([a-z0-9-]+)$/);
     if (slugMatch) {
       const slug = slugMatch[1];
-      const tool = tools.find(t => t.slug === slug);
-
+      const tool = tools.find((t) => t.slug === slug);
+      
       if (!tool) {
         return {
           statusCode: 404,
@@ -115,13 +107,67 @@ export const handler: Handler = async (event: HandlerEvent, context: HandlerCont
       };
     }
 
+    // GET /api/tools (list with filters and pagination)
+    const params = event.queryStringParameters || {};
+    const page = parseInt(params.page || '1', 10);
+    const limit = parseInt(params.limit || '24', 10);
+    const search = params.search?.toLowerCase() || '';
+    const category = params.category || '';
+    const pricing = params.pricing || '';
+    const platform = params.platform || '';
+
+    let filteredTools = [...tools];
+
+    // Apply search filter
+    if (search) {
+      filteredTools = filteredTools.filter(
+        (tool) =>
+          tool.name.toLowerCase().includes(search) ||
+          tool.short_description.toLowerCase().includes(search) ||
+          tool.description.toLowerCase().includes(search)
+      );
+    }
+
+    // Apply category filter
+    if (category) {
+      filteredTools = filteredTools.filter(
+        (tool) =>
+          tool.primary_category === category ||
+          tool.secondary_category === category
+      );
+    }
+
+    // Apply pricing filter
+    if (pricing) {
+      filteredTools = filteredTools.filter((tool) => tool.pricing === pricing);
+    }
+
+    // Apply platform filter
+    if (platform) {
+      filteredTools = filteredTools.filter((tool) => tool.platform_type === platform);
+    }
+
+    // Calculate pagination
+    const total = filteredTools.length;
+    const totalPages = Math.ceil(total / limit);
+    const offset = (page - 1) * limit;
+    const paginatedTools = filteredTools.slice(offset, offset + limit);
+
     return {
-      statusCode: 404,
+      statusCode: 200,
       headers,
-      body: JSON.stringify({ error: 'Not found' }),
+      body: JSON.stringify({
+        tools: paginatedTools,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages,
+        },
+      }),
     };
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Error in tools function:', error);
     return {
       statusCode: 500,
       headers,
