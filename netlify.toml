@@ -1,11 +1,16 @@
 [build]
   command = "npm run build"
   publish = "dist/public"
-  functions = "dist/server"
+  functions = "netlify/functions"
 
 [[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/index/:splat"
+  from = "/api/tools*"
+  to = "/.netlify/functions/tools:splat"
+  status = 200
+
+[[redirects]]
+  from = "/api/categories"
+  to = "/.netlify/functions/tools/categories"
   status = 200
 
 [[redirects]]
