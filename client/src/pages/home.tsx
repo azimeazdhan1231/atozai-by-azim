@@ -227,34 +227,61 @@ export default function Home() {
                     </Button>
                     
                     <div className="flex items-center gap-1">
-                      {Array.from({ length: Math.min(5, toolsData.totalPages) }, (_, i) => {
-                        const page = i + 1;
-                        return (
-                          <Button
-                            key={page}
-                            variant={(filters.page || 1) === page ? "default" : "outline"}
-                            size="icon"
-                            onClick={() => setFilters((prev) => ({ ...prev, page }))}
-                            data-testid={`button-page-${page}`}
-                            className="w-10"
-                          >
-                            {page}
-                          </Button>
-                        );
-                      })}
-                      {toolsData.totalPages > 5 && (
-                        <>
-                          <span className="px-2 text-muted-foreground">...</span>
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={() => setFilters((prev) => ({ ...prev, page: toolsData.totalPages }))}
-                            className="w-10"
-                          >
-                            {toolsData.totalPages}
-                          </Button>
-                        </>
-                      )}
+                      {(() => {
+                        const currentPage = filters.page || 1;
+                        const totalPages = toolsData.totalPages;
+                        const pages: (number | 'ellipsis')[] = [];
+                        
+                        // Always show first page
+                        pages.push(1);
+                        
+                        // Calculate range around current page
+                        const rangeStart = Math.max(2, currentPage - 2);
+                        const rangeEnd = Math.min(totalPages - 1, currentPage + 2);
+                        
+                        // Add ellipsis after first page if needed
+                        if (rangeStart > 2) {
+                          pages.push('ellipsis');
+                        }
+                        
+                        // Add pages around current page
+                        for (let i = rangeStart; i <= rangeEnd; i++) {
+                          pages.push(i);
+                        }
+                        
+                        // Add ellipsis before last page if needed
+                        if (rangeEnd < totalPages - 1) {
+                          pages.push('ellipsis');
+                        }
+                        
+                        // Always show last page (if there's more than one page)
+                        if (totalPages > 1) {
+                          pages.push(totalPages);
+                        }
+                        
+                        return pages.map((page, idx) => {
+                          if (page === 'ellipsis') {
+                            return (
+                              <span key={`ellipsis-${idx}`} className="px-2 text-muted-foreground">
+                                ...
+                              </span>
+                            );
+                          }
+                          
+                          return (
+                            <Button
+                              key={page}
+                              variant={currentPage === page ? "default" : "outline"}
+                              size="icon"
+                              onClick={() => setFilters((prev) => ({ ...prev, page }))}
+                              data-testid={`button-page-${page}`}
+                              className="w-10"
+                            >
+                              {page}
+                            </Button>
+                          );
+                        });
+                      })()}
                     </div>
 
                     <Button
