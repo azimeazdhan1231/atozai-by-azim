@@ -70,7 +70,7 @@ export function ToolCard({ tool }: ToolCardProps) {
       </CardContent>
 
       <CardFooter className="gap-2 pt-4 border-t">
-        <Link href={`/tool/${tool.slug}`}>
+        <Link href={`/tool/${tool.slug}`} asChild>
           <a className="flex-1">
             <Button
               variant="outline"

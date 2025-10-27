@@ -54,7 +54,7 @@ export default function ToolDetail() {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center space-y-4">
           <h2 className="text-2xl font-bold">Tool not found</h2>
-          <Link href="/">
+          <Link href="/" asChild>
             <a>
               <Button>Go Home</Button>
             </a>
@@ -74,7 +74,7 @@ export default function ToolDetail() {
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 md:px-6 lg:px-8 py-8">
         {/* Breadcrumb */}
-        <Link href="/">
+        <Link href="/" asChild>
           <a>
             <Button
               variant="ghost"
@@ -226,7 +226,7 @@ export default function ToolDetail() {
                     .filter((t) => t.id !== tool.id)
                     .slice(0, 3)
                     .map((relatedTool) => (
-                      <Link key={relatedTool.id} href={`/tool/${relatedTool.slug}`}>
+                      <Link key={relatedTool.id} href={`/tool/${relatedTool.slug}`} asChild>
                         <a className="block hover-elevate active-elevate-2 rounded-lg p-3 border transition-all">
                           <h4 className="font-semibold mb-1 line-clamp-1">{relatedTool.name}</h4>
                           <p className="text-sm text-muted-foreground line-clamp-2">

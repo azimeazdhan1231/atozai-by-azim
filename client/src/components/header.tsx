@@ -10,7 +10,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6 lg:px-8">
-        <Link href="/">
+        <Link href="/" asChild>
           <a
             data-testid="link-home"
             className="flex items-center gap-2 hover-elevate active-elevate-2 rounded-lg px-3 py-2 transition-all"
@@ -25,7 +25,7 @@ export function Header() {
         </Link>
 
         <nav className="hidden md:flex items-center gap-1">
-          <Link href="/">
+          <Link href="/" asChild>
             <a
               data-testid="link-tools"
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors hover-elevate active-elevate-2 ${
@@ -37,7 +37,7 @@ export function Header() {
               Browse Tools
             </a>
           </Link>
-          <Link href="/categories">
+          <Link href="/categories" asChild>
             <a
               data-testid="link-categories"
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors hover-elevate active-elevate-2 ${
