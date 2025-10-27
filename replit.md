@@ -105,9 +105,32 @@ Preferred communication style: Simple, everyday language.
 **Build Process**
 - Client build: Vite bundles React application to `dist/public`
 - Server build: ESBuild bundles Express server to `dist/index.js`
+- Netlify Functions: Custom build script (`scripts/build-functions.sh`) bundles both tools.ts and categories.ts serverless functions
+- Data files: Server data copied from `server/data/` to `dist/data/` during build
 - Production mode serves pre-built static files
+
+**Netlify Deployment**
+- Serverless functions located in `netlify/functions/`
+- Two separate functions: `tools.ts` (handles tool listing and details) and `categories.ts` (handles category data)
+- Both functions implement multiple fallback paths for data loading to ensure compatibility across environments
+- API routing configured in `netlify.toml` with redirects from `/api/*` to serverless functions
+- Build command: `npm run build && bash scripts/build-functions.sh`
 
 **Environment Configuration**
 - DATABASE_URL environment variable for PostgreSQL connection
 - NODE_ENV for environment-specific behavior
 - Vite-specific variables for development features
+
+### Recent Changes (October 2025)
+
+**UI Improvements**
+- Removed clear/cross button from search bar for cleaner interface
+- Added scroll-to-top behavior when navigating to tool detail pages
+- Fixed category navigation using proper URL parameters (`primary_category`)
+- Enhanced footer with developer credit (Azim Eazdhan) and clickable WhatsApp contact button
+
+**Netlify Deployment Fixes**
+- Created dedicated `categories.ts` serverless function to properly serve categories data
+- Updated both Netlify functions with comprehensive fallback paths for data file loading
+- Created custom build script to ensure both serverless functions are properly bundled
+- Fixed nested anchor tag issues by consistently using `asChild` prop with wouter Link component
