@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { filterParamsSchema } from "@shared/schema";
+import { filterParamsSchema, insertContactMessageSchema } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Get all tools with filtering and pagination
@@ -67,6 +67,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error searching tools:", error);
       res.status(500).json({ error: "Failed to search tools" });
+    }
+  });
+
+  // Get all AI agents
+  app.get("/api/agents", async (req, res) => {
+    try {
+      const agents = await storage.getAllAgents();
+      res.json(agents);
+    } catch (error) {
+      console.error("Error fetching agents:", error);
+      res.status(500).json({ error: "Failed to fetch agents" });
+    }
+  });
+
+  // Submit contact form
+  app.post("/api/contact", async (req, res) => {
+    try {
+      const message = insertContactMessageSchema.parse(req.body);
+      const savedMessage = await storage.addContactMessage(message);
+      res.status(201).json(savedMessage);
+    } catch (error) {
+      console.error("Error submitting contact:", error);
+      if (error instanceof Error && error.name === "ZodError") {
+        res.status(400).json({ error: "Invalid contact data", details: error });
+      } else {
+        res.status(500).json({ error: "Failed to submit contact" });
+      }
     }
   });
 

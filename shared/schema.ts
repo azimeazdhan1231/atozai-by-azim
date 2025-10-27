@@ -52,3 +52,30 @@ export interface CategoryInfo {
   count: number;
   slug: string;
 }
+
+// Agent Tool schema for Top AI Agents page
+export const agentToolSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  description: z.string(),
+  url: z.string().url(),
+  category: z.string(),
+  features: z.array(z.string()),
+  freeTier: z.string(),
+});
+
+export type AgentTool = z.infer<typeof agentToolSchema>;
+
+// Contact Message schema
+export const contactMessageSchema = z.object({
+  id: z.number(),
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Invalid email address"),
+  message: z.string().min(10, "Message must be at least 10 characters"),
+  createdAt: z.string(),
+});
+
+export const insertContactMessageSchema = contactMessageSchema.omit({ id: true, createdAt: true });
+
+export type ContactMessage = z.infer<typeof contactMessageSchema>;
+export type InsertContactMessage = z.infer<typeof insertContactMessageSchema>;

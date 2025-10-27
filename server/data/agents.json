@@ -1,0 +1,137 @@
+[
+  {
+    "id": 1,
+    "name": "Botpress",
+    "description": "Visual drag-and-drop AI agent builder perfect for creating customer support chatbots and conversational AI with CRM integrations",
+    "url": "https://www.botpress.com",
+    "category": "No-Code Builder",
+    "features": ["Visual flow builder", "CRM integrations", "Memory & conditions", "Multi-channel deployment"],
+    "freeTier": "Limited LLM credits with visual drag-and-drop builder"
+  },
+  {
+    "id": 2,
+    "name": "Gumloop",
+    "description": "Marketing automation platform with AI agents for SEO, web scraping, and workflow automation with template library",
+    "url": "https://gumloop.com",
+    "category": "Marketing Automation",
+    "features": ["Template library", "Marketing automation", "Visual interface", "SEO tools"],
+    "freeTier": "1,000 free credits on signup"
+  },
+  {
+    "id": 3,
+    "name": "Voiceflow",
+    "description": "No-code conversational AI platform for building voice assistants and chatbots across multiple platforms",
+    "url": "https://www.voiceflow.com",
+    "category": "No-Code Builder",
+    "features": ["Drag-and-drop interface", "Cross-channel deployment", "Collaboration tools", "Voice & chat support"],
+    "freeTier": "Free plan available with full feature access"
+  },
+  {
+    "id": 4,
+    "name": "Google Vertex AI",
+    "description": "Enterprise-grade AI agents and ML workflows platform with comprehensive MLOps tools and agent builder",
+    "url": "https://cloud.google.com/vertex-ai",
+    "category": "Enterprise",
+    "features": ["Agent builder", "MLOps tools", "Model training", "Enterprise integrations"],
+    "freeTier": "$300 free credits for new customers"
+  },
+  {
+    "id": 5,
+    "name": "AutoGPT",
+    "description": "Open-source autonomous AI agent that can perform complex coding tasks and multi-step operations independently",
+    "url": "https://autogpt.net",
+    "category": "Developer Tools",
+    "features": ["Autonomous task execution", "Multi-step workflows", "Code generation", "File operations"],
+    "freeTier": "Free & open-source (requires OpenAI API key)"
+  },
+  {
+    "id": 6,
+    "name": "MetaGPT",
+    "description": "Multi-agent framework for software development collaboration enabling AI agents to work together on coding projects",
+    "url": "https://github.com/geekan/MetaGPT",
+    "category": "Developer Tools",
+    "features": ["Multi-agent collaboration", "Software development", "Team simulation", "Code architecture"],
+    "freeTier": "Free & open-source"
+  },
+  {
+    "id": 7,
+    "name": "LangGraph",
+    "description": "Flexible framework for building custom AI agent workflows and LLM applications with advanced control flow",
+    "url": "https://www.langchain.com/langgraph",
+    "category": "Developer Framework",
+    "features": ["Custom workflows", "LLM integration", "State management", "Advanced control flow"],
+    "freeTier": "Free & open-source (part of LangChain)"
+  },
+  {
+    "id": 8,
+    "name": "Flowise",
+    "description": "Open-source no-code AI agent builder with drag-and-drop interface supporting 100+ LLM integrations",
+    "url": "https://flowiseai.com",
+    "category": "No-Code Builder",
+    "features": ["100+ LLM integrations", "Visual workflow builder", "Self-hosted", "API generation"],
+    "freeTier": "Free & open-source"
+  },
+  {
+    "id": 9,
+    "name": "GitHub Copilot",
+    "description": "AI-powered code generation assistant with autonomous issue resolution and intelligent code review capabilities",
+    "url": "https://github.com/features/copilot",
+    "category": "Coding Assistant",
+    "features": ["Code completion", "Issue resolution", "Code review", "Multi-language support"],
+    "freeTier": "Free tier for students and educators"
+  },
+  {
+    "id": 10,
+    "name": "Replit Agent",
+    "description": "Full-stack app building agent that creates complete applications from text prompts directly in your browser",
+    "url": "https://replit.com",
+    "category": "Coding Assistant",
+    "features": ["Full-stack development", "Browser-based", "Instant deployment", "Natural language coding"],
+    "freeTier": "Free plan available"
+  },
+  {
+    "id": 11,
+    "name": "Cursor",
+    "description": "AI-native code editor with intelligent completions and context-aware code generation for developers",
+    "url": "https://cursor.sh",
+    "category": "Coding Assistant",
+    "features": ["AI completions", "Context-aware", "Multi-file editing", "Code understanding"],
+    "freeTier": "Free plan with limited features"
+  },
+  {
+    "id": 12,
+    "name": "Windsurf",
+    "description": "AI-native IDE with flow tracking and repository-aware suggestions for enhanced development workflow",
+    "url": "https://codeium.com/windsurf",
+    "category": "Coding Assistant",
+    "features": ["Flow tracking", "Repo-aware suggestions", "Multi-language", "Context understanding"],
+    "freeTier": "Free tier available"
+  },
+  {
+    "id": 13,
+    "name": "Zapier Central",
+    "description": "AI assistants for workflow automation connecting multiple apps with intelligent task execution",
+    "url": "https://zapier.com/central",
+    "category": "Workflow Automation",
+    "features": ["Multi-app automation", "AI workspace", "Task orchestration", "Integration library"],
+    "freeTier": "Free plan in beta phase"
+  },
+  {
+    "id": 14,
+    "name": "n8n",
+    "description": "Self-hosted workflow automation platform with powerful AI agent capabilities and extensive API integrations",
+    "url": "https://n8n.io",
+    "category": "Workflow Automation",
+    "features": ["Self-hosted", "API integrations", "Visual workflows", "Custom nodes"],
+    "freeTier": "Free & open-source (self-hosted)"
+  },
+  {
+    "id": 15,
+    "name": "Relevance AI",
+    "description": "No-code AI agents for business workflows with pre-built templates and powerful automation capabilities",
+    "url": "https://relevanceai.com",
+    "category": "Business Automation",
+    "features": ["Pre-built templates", "Business workflows", "No-code interface", "Team collaboration"],
+    "freeTier": "Free tier available"
+  }
+]

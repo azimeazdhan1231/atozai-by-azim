@@ -8,6 +8,8 @@ import { Header } from "@/components/header";
 import Home from "@/pages/home";
 import ToolDetail from "@/pages/tool-detail";
 import CategoriesPage from "@/pages/categories";
+import TopAIAgents from "@/pages/top-ai-agents";
+import Contact from "@/pages/contact";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -19,6 +21,8 @@ function Router() {
           <Route path="/" component={Home} />
           <Route path="/tool/:slug" component={ToolDetail} />
           <Route path="/categories" component={CategoriesPage} />
+          <Route path="/agents" component={TopAIAgents} />
+          <Route path="/contact" component={Contact} />
           <Route component={NotFound} />
         </Switch>
       </main>

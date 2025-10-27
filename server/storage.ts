@@ -1,21 +1,31 @@
-import type { Tool, FilterParams, Categories, ToolsResponse } from "@shared/schema";
+import type { Tool, FilterParams, Categories, ToolsResponse, AgentTool, ContactMessage, InsertContactMessage } from "@shared/schema";
 import toolsData from "./data/tools.json";
 import categoriesData from "./data/categories.json";
+import agentsData from "./data/agents.json";
 
 export interface IStorage {
   getAllTools(filters: FilterParams): Promise<ToolsResponse>;
   getToolBySlug(slug: string): Promise<Tool | undefined>;
   getCategories(): Promise<Categories>;
   searchTools(query: string): Promise<Tool[]>;
+  getAllAgents(): Promise<AgentTool[]>;
+  addContactMessage(message: InsertContactMessage): Promise<ContactMessage>;
+  getAllContactMessages(): Promise<ContactMessage[]>;
 }
 
 export class MemStorage implements IStorage {
   private tools: Tool[];
   private categories: Categories;
+  private agents: AgentTool[];
+  private contactMessages: ContactMessage[];
+  private messageIdCounter: number;
 
   constructor() {
     this.tools = toolsData as Tool[];
     this.categories = categoriesData as Categories;
+    this.agents = agentsData as AgentTool[];
+    this.contactMessages = [];
+    this.messageIdCounter = 1;
   }
 
   async getAllTools(filters: FilterParams): Promise<ToolsResponse> {
@@ -102,6 +112,24 @@ export class MemStorage implements IStorage {
         tool.short_description.toLowerCase().includes(searchLower) ||
         tool.description.toLowerCase().includes(searchLower)
     );
+  }
+
+  async getAllAgents(): Promise<AgentTool[]> {
+    return this.agents;
+  }
+
+  async addContactMessage(message: InsertContactMessage): Promise<ContactMessage> {
+    const newMessage: ContactMessage = {
+      id: this.messageIdCounter++,
+      ...message,
+      createdAt: new Date().toISOString(),
+    };
+    this.contactMessages.push(newMessage);
+    return newMessage;
+  }
+
+  async getAllContactMessages(): Promise<ContactMessage[]> {
+    return this.contactMessages;
   }
 }
 

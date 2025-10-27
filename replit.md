@@ -123,6 +123,23 @@ Preferred communication style: Simple, everyday language.
 
 ### Recent Changes (October 2025)
 
+**New Features (Latest)**
+- Added "Top AI Agents" page featuring 15 curated free AI agent tools for 2025
+  - Includes detailed information about each agent: features, free tier details, categories
+  - Responsive grid layout with touch-friendly cards
+  - SEO optimized with meta descriptions and Open Graph tags
+- Added "Contact" page with multiple contact options
+  - WhatsApp integration for quick messaging
+  - Validated contact form with React Hook Form and Zod validation
+  - Address information (Dhaka 1212, Bangladesh)
+  - Success state with confirmation message
+  - SEO optimized with meta descriptions and Open Graph tags
+- Extended data model with AgentTool and ContactMessage schemas
+- Created new API endpoints: `/api/agents` (GET) and `/api/contact` (POST)
+- Added corresponding Netlify serverless functions with proper CORS and error handling
+- Updated header navigation to include new pages with active state indicators
+- All new pages follow responsive design patterns with touch-friendly interactions (min-h-10 buttons, proper spacing)
+
 **UI Improvements**
 - Removed clear/cross button from search bar for cleaner interface
 - Added scroll-to-top behavior when navigating to tool detail pages
@@ -134,3 +151,5 @@ Preferred communication style: Simple, everyday language.
 - Updated both Netlify functions with comprehensive fallback paths for data file loading
 - Created custom build script to ensure both serverless functions are properly bundled
 - Fixed nested anchor tag issues by consistently using `asChild` prop with wouter Link component
+- Added build configuration for new `agents.ts` and `contact.ts` serverless functions
+- Updated netlify.toml with redirects for new API endpoints

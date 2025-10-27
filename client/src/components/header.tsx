@@ -49,6 +49,30 @@ export function Header() {
               Categories
             </a>
           </Link>
+          <Link href="/agents" asChild>
+            <a
+              data-testid="link-agents"
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors hover-elevate active-elevate-2 ${
+                location === "/agents" 
+                  ? "bg-primary/10 text-primary" 
+                  : "text-muted-foreground"
+              }`}
+            >
+              Top AI Agents
+            </a>
+          </Link>
+          <Link href="/contact" asChild>
+            <a
+              data-testid="link-contact"
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors hover-elevate active-elevate-2 ${
+                location === "/contact" 
+                  ? "bg-primary/10 text-primary" 
+                  : "text-muted-foreground"
+              }`}
+            >
+              Contact
+            </a>
+          </Link>
         </nav>
 
         <Button
