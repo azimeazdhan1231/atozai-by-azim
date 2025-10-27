@@ -70,7 +70,7 @@ export default function CategoriesPage() {
                 const count = getCategoryCount(category);
                 const slug = category.toLowerCase().replace(/\s+/g, "-");
                 return (
-                  <Link key={category} href={`/?category=${encodeURIComponent(category)}`}>
+                  <Link key={category} href={`/?primary_category=${encodeURIComponent(category)}`} asChild>
                     <a data-testid={`link-category-${slug}`}>
                       <Card className="h-full hover:shadow-lg hover:border-primary/50 transition-all duration-200 hover-elevate active-elevate-2">
                         <CardHeader className="flex flex-row items-start gap-4 space-y-0">

@@ -21,6 +21,19 @@ export default function Home() {
   });
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Read URL parameters on mount
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const primary_category = params.get('primary_category');
+    
+    if (primary_category) {
+      setFilters((prev) => ({
+        ...prev,
+        primary_category: decodeURIComponent(primary_category),
+      }));
+    }
+  }, []);
+
   // Build query string from filters
   const queryParams = new URLSearchParams();
   if (filters.search) queryParams.append("search", filters.search);

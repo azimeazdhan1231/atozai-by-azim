@@ -1,5 +1,6 @@
 import { useRoute, Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { ArrowLeft, ExternalLink, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +12,11 @@ import type { Tool } from "@shared/schema";
 export default function ToolDetail() {
   const [, params] = useRoute("/tool/:slug");
   const slug = params?.slug;
+
+  // Scroll to top when component loads
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [slug]);
 
   const { data: tool, isLoading } = useQuery<Tool>({
     queryKey: [`/api/tools/${slug}`],
