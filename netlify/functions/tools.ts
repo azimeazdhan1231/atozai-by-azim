@@ -24,23 +24,28 @@ interface Categories {
   platform: string[];
 }
 
-// Load data from JSON files
+// Load data from JSON files with multiple fallback paths
 let tools: Tool[] = [];
 let categories: Categories = { primary: [], secondary: [], pricing: [], platform: [] };
 
 try {
-  // Try different paths for data files
+  // Try different paths where data might be located in Netlify environment
   const possiblePaths = [
-    join(process.cwd(), 'server/data/tools.json'),
-    join(process.cwd(), 'data/tools.json'),
+    join(process.cwd(), 'data/tools.json'),              // After build copy
+    join(process.cwd(), 'server/data/tools.json'),       // Development
+    join(process.cwd(), '../../data/tools.json'),        // Netlify function context
     join(process.cwd(), '../../server/data/tools.json'),
+    './data/tools.json',                                 // Relative path
+    '../../../data/tools.json',
   ];
 
   let toolsPath = '';
   for (const path of possiblePaths) {
     try {
-      readFileSync(path);
+      const content = readFileSync(path, 'utf-8');
       toolsPath = path;
+      tools = JSON.parse(content);
+      console.log(`Successfully loaded tools from: ${path}`);
       break;
     } catch {
       continue;
@@ -48,17 +53,21 @@ try {
   }
 
   if (toolsPath) {
-    tools = JSON.parse(readFileSync(toolsPath, 'utf-8'));
     const categoriesPath = toolsPath.replace('tools.json', 'categories.json');
-    categories = JSON.parse(readFileSync(categoriesPath, 'utf-8'));
+    try {
+      categories = JSON.parse(readFileSync(categoriesPath, 'utf-8'));
+      console.log(`Successfully loaded categories from: ${categoriesPath}`);
+    } catch (err) {
+      console.error('Error loading categories:', err);
+    }
+  } else {
+    console.error('Failed to load tools from any path. Tried:', possiblePaths);
   }
 } catch (error) {
   console.error('Error loading data files:', error);
 }
 
 export const handler: Handler = async (event) => {
-  const path = event.path.replace('/.netlify/functions/tools', '');
-  
   // CORS headers
   const headers = {
     'Access-Control-Allow-Origin': '*',
@@ -77,14 +86,8 @@ export const handler: Handler = async (event) => {
   }
 
   try {
-    // GET /api/categories
-    if (path === '/categories' || path === '' && event.queryStringParameters?.endpoint === 'categories') {
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify(categories),
-      };
-    }
+    // Parse the path - handle both direct calls and rewrites
+    const path = event.path.replace('/.netlify/functions/tools', '').replace('/.netlify/functions/categories', '');
 
     // GET /api/tools/:slug (single tool)
     const slugMatch = path.match(/^\/([a-z0-9-]+)$/);

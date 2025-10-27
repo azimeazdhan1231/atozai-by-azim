@@ -1,11 +1,11 @@
 [build]
-  command = "npm run build"
+  command = "npm run build && bash scripts/build-functions.sh"
   publish = "dist/public"
   functions = "dist/netlify/functions"
 
 [[redirects]]
   from = "/api/categories"
-  to = "/.netlify/functions/tools/categories"
+  to = "/.netlify/functions/categories"
   status = 200
 
 [[redirects]]
