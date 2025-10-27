@@ -15,7 +15,7 @@ interface FilterPanelProps {
 
 export function FilterPanel({ filters, onFilterChange, categories, onClearFilters }: FilterPanelProps) {
   const pricingOptions: Array<"Free" | "Paid" | "Freemium"> = ["Free", "Paid", "Freemium"];
-  
+
   const activeFiltersCount = 
     (filters.pricing?.length || 0) + 
     (filters.primary_category ? 1 : 0);
@@ -40,62 +40,66 @@ export function FilterPanel({ filters, onFilterChange, categories, onClearFilter
           </Button>
         )}
       </CardHeader>
-      
-      <CardContent className="space-y-6">
-        <div className="space-y-3">
-          <Label className="text-sm font-semibold">Pricing</Label>
-          <div className="space-y-2">
-            {pricingOptions.map((option) => (
-              <div key={option} className="flex items-center gap-2">
-                <Checkbox
-                  id={`pricing-${option}`}
-                  checked={filters.pricing?.includes(option) || false}
-                  onCheckedChange={(checked) => {
-                    const current = filters.pricing || [];
-                    onFilterChange({
-                      pricing: checked
-                        ? [...current, option]
-                        : current.filter((p) => p !== option),
-                    });
-                  }}
-                  data-testid={`checkbox-pricing-${option.toLowerCase()}`}
-                />
-                <Label
-                  htmlFor={`pricing-${option}`}
-                  className="text-sm font-normal cursor-pointer flex-1"
-                >
-                  {option}
-                </Label>
-              </div>
-            ))}
-          </div>
-        </div>
 
-        <div className="space-y-3">
-          <Label className="text-sm font-semibold">Categories</Label>
-          <div className="space-y-2 max-h-[500px] overflow-y-auto pr-2">
-            {categories.map((category) => (
-              <div key={category} className="flex items-center gap-2">
-                <Checkbox
-                  id={`category-${category}`}
-                  checked={filters.primary_category === category}
-                  onCheckedChange={(checked) => {
-                    onFilterChange({
-                      primary_category: checked ? category : undefined,
-                    });
-                  }}
-                  data-testid={`checkbox-category-${category.toLowerCase().replace(/\s+/g, '-')}`}
-                />
-                <Label
-                  htmlFor={`category-${category}`}
-                  className="text-sm font-normal cursor-pointer flex-1 line-clamp-1"
-                  title={category}
-                >
-                  {category}
-                </Label>
-              </div>
-            ))}
+      <CardContent className="p-4">
+        <div className="space-y-6">
+          <div className="space-y-3">
+            <Label className="text-sm font-semibold">Pricing</Label>
+            <div className="space-y-2">
+              {pricingOptions.map((option) => (
+                <div key={option} className="flex items-center gap-2">
+                  <Checkbox
+                    id={`pricing-${option}`}
+                    checked={filters.pricing?.includes(option) || false}
+                    onCheckedChange={(checked) => {
+                      const current = filters.pricing || [];
+                      onFilterChange({
+                        pricing: checked
+                          ? [...current, option]
+                          : current.filter((p) => p !== option),
+                      });
+                    }}
+                    data-testid={`checkbox-pricing-${option.toLowerCase()}`}
+                  />
+                  <Label
+                    htmlFor={`pricing-${option}`}
+                    className="text-sm font-normal cursor-pointer flex-1"
+                  >
+                    {option}
+                  </Label>
+                </div>
+              ))}
+            </div>
           </div>
+
+          {categories.length > 0 && (
+            <div className="space-y-3">
+              <Label className="text-sm font-semibold">Categories</Label>
+              <div className="space-y-2 max-h-[500px] overflow-y-auto pr-2">
+                {categories.map((category) => (
+                  <div key={category} className="flex items-center gap-2">
+                    <Checkbox
+                      id={`category-${category}`}
+                      checked={filters.primary_category === category}
+                      onCheckedChange={(checked) => {
+                        onFilterChange({
+                          primary_category: checked ? category : undefined,
+                        });
+                      }}
+                      data-testid={`checkbox-category-${category.toLowerCase().replace(/\s+/g, '-')}`}
+                    />
+                    <Label
+                      htmlFor={`category-${category}`}
+                      className="text-sm font-normal cursor-pointer flex-1 line-clamp-1"
+                      title={category}
+                    >
+                      {category}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>

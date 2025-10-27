@@ -7,11 +7,11 @@ import { Sparkles, Folder } from "lucide-react";
 import type { Categories } from "@shared/schema";
 
 export default function CategoriesPage() {
-  const { data: categories, isLoading } = useQuery<Categories>({
+  const { data: categories, isLoading, error } = useQuery<Categories>({
     queryKey: ["/api/categories"],
   });
 
-  const { data: toolsData } = useQuery<{
+  const { data: toolsData, isLoading: toolsLoading } = useQuery<{
     tools: any[];
     total: number;
     page: number;
@@ -20,10 +20,26 @@ export default function CategoriesPage() {
     queryKey: ["/api/tools?limit=10000"],
   });
 
+  console.log("Categories data:", categories);
+  console.log("Tools data:", toolsData);
+  console.log("Error:", error);
+
   const getCategoryCount = (category: string) => {
     if (!toolsData) return 0;
     return toolsData.tools.filter((tool) => tool.primary_category === category).length;
   };
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-background">
+        <section className="container mx-auto px-4 md:px-6 lg:px-8 py-12">
+          <div className="text-center py-20">
+            <p className="text-muted-foreground">Error loading categories. Please try again later.</p>
+          </div>
+        </section>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -48,7 +64,7 @@ export default function CategoriesPage() {
 
       {/* Categories Grid */}
       <section className="container mx-auto px-4 md:px-6 lg:px-8 py-12">
-        {isLoading ? (
+        {isLoading || toolsLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {Array.from({ length: 20 }).map((_, i) => (
               <Card key={i}>
@@ -61,9 +77,13 @@ export default function CategoriesPage() {
               </Card>
             ))}
           </div>
+        ) : !categories?.primary || categories.primary.length === 0 ? (
+          <div className="text-center py-20">
+            <p className="text-muted-foreground">No categories available.</p>
+          </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {categories?.primary
+            {categories.primary
               .filter((cat) => getCategoryCount(cat) > 0)
               .sort((a, b) => getCategoryCount(b) - getCategoryCount(a))
               .map((category) => {

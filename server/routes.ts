@@ -47,12 +47,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get all categories
-  app.get("/api/categories", async (_req, res) => {
+  app.get("/api/categories", async (req, res) => {
     try {
       const categories = await storage.getCategories();
+      console.log("Categories endpoint called, returning:", categories);
       res.json(categories);
     } catch (error) {
-      console.error("Error fetching categories:", error);
+      console.error("Error in /api/categories:", error);
       res.status(500).json({ error: "Failed to fetch categories" });
     }
   });
