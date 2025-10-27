@@ -112,9 +112,15 @@ export const handler: Handler = async (event) => {
     const page = parseInt(params.page || '1', 10);
     const limit = parseInt(params.limit || '24', 10);
     const search = params.search?.toLowerCase() || '';
-    const category = params.category || '';
-    const pricing = params.pricing || '';
-    const platform = params.platform || '';
+    const primary_category = params.primary_category || '';
+    const secondary_category = params.secondary_category || '';
+    const platform_type = params.platform_type || '';
+    
+    // Handle pricing as array (can be multiple values)
+    let pricingArray: string[] = [];
+    if (params.pricing) {
+      pricingArray = Array.isArray(params.pricing) ? params.pricing : [params.pricing];
+    }
 
     let filteredTools = [...tools];
 
@@ -124,27 +130,36 @@ export const handler: Handler = async (event) => {
         (tool) =>
           tool.name.toLowerCase().includes(search) ||
           tool.short_description.toLowerCase().includes(search) ||
-          tool.description.toLowerCase().includes(search)
-      );
-    }
-
-    // Apply category filter
-    if (category) {
-      filteredTools = filteredTools.filter(
-        (tool) =>
-          tool.primary_category === category ||
-          tool.secondary_category === category
+          tool.description.toLowerCase().includes(search) ||
+          tool.primary_category.toLowerCase().includes(search) ||
+          tool.secondary_category.toLowerCase().includes(search)
       );
     }
 
     // Apply pricing filter
-    if (pricing) {
-      filteredTools = filteredTools.filter((tool) => tool.pricing === pricing);
+    if (pricingArray.length > 0) {
+      filteredTools = filteredTools.filter((tool) => 
+        pricingArray.includes(tool.pricing)
+      );
     }
 
-    // Apply platform filter
-    if (platform) {
-      filteredTools = filteredTools.filter((tool) => tool.platform_type === platform);
+    // Apply primary category filter
+    if (primary_category) {
+      filteredTools = filteredTools.filter(
+        (tool) => tool.primary_category === primary_category
+      );
+    }
+
+    // Apply secondary category filter
+    if (secondary_category) {
+      filteredTools = filteredTools.filter(
+        (tool) => tool.secondary_category === secondary_category
+      );
+    }
+
+    // Apply platform type filter
+    if (platform_type) {
+      filteredTools = filteredTools.filter((tool) => tool.platform_type === platform_type);
     }
 
     // Calculate pagination
@@ -158,12 +173,10 @@ export const handler: Handler = async (event) => {
       headers,
       body: JSON.stringify({
         tools: paginatedTools,
-        pagination: {
-          page,
-          limit,
-          total,
-          totalPages,
-        },
+        total,
+        page,
+        totalPages,
+        hasMore: page < totalPages,
       }),
     };
   } catch (error) {
