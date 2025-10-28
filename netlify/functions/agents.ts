@@ -1,6 +1,5 @@
 import { Handler } from '@netlify/functions';
-import { readFileSync } from 'fs';
-import { join } from 'path';
+import agentsData from '../../server/data/agents.json';
 
 interface AgentTool {
   id: number;
@@ -12,38 +11,8 @@ interface AgentTool {
   freeTier: string;
 }
 
-// Load agents data from JSON file with multiple fallback paths
-let agents: AgentTool[] = [];
-
-try {
-  const possiblePaths = [
-    join(process.cwd(), 'data/agents.json'),
-    join(process.cwd(), 'server/data/agents.json'),
-    join(process.cwd(), '../../data/agents.json'),
-    join(process.cwd(), '../../server/data/agents.json'),
-    './data/agents.json',
-    '../../../data/agents.json',
-  ];
-
-  let agentsPath = '';
-  for (const path of possiblePaths) {
-    try {
-      const content = readFileSync(path, 'utf-8');
-      agentsPath = path;
-      agents = JSON.parse(content);
-      console.log(`Successfully loaded agents from: ${path}`);
-      break;
-    } catch {
-      continue;
-    }
-  }
-
-  if (!agentsPath) {
-    console.error('Failed to load agents from any path. Tried:', possiblePaths);
-  }
-} catch (error) {
-  console.error('Error loading agents data file:', error);
-}
+// Import data directly - it will be bundled into the function
+const agents: AgentTool[] = agentsData as AgentTool[];
 
 export const handler: Handler = async (event) => {
   const headers = {

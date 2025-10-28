@@ -1,6 +1,5 @@
 import { Handler } from '@netlify/functions';
-import { readFileSync } from 'fs';
-import { join } from 'path';
+import categoriesData from '../../server/data/categories.json';
 
 interface Categories {
   primary: string[];
@@ -9,40 +8,8 @@ interface Categories {
   platform: string[];
 }
 
-// Load categories data with multiple fallback paths
-let categories: Categories = { primary: [], secondary: [], pricing: [], platform: [] };
-
-try {
-  // Try different paths where data might be located in Netlify environment
-  const possiblePaths = [
-    join(process.cwd(), 'data/categories.json'),           // After build copy
-    join(process.cwd(), 'server/data/categories.json'),    // Development
-    join(process.cwd(), '../../data/categories.json'),     // Netlify function context
-    join(process.cwd(), '../../server/data/categories.json'),
-    './data/categories.json',                              // Relative path
-    '../../../data/categories.json',
-  ];
-
-  let categoriesPath = '';
-  for (const path of possiblePaths) {
-    try {
-      const content = readFileSync(path, 'utf-8');
-      categoriesPath = path;
-      categories = JSON.parse(content);
-      console.log(`Successfully loaded categories from: ${path}`);
-      break;
-    } catch (err) {
-      // Try next path
-      continue;
-    }
-  }
-
-  if (!categoriesPath) {
-    console.error('Failed to load categories from any path. Tried:', possiblePaths);
-  }
-} catch (error) {
-  console.error('Error loading categories data:', error);
-}
+// Import data directly - it will be bundled into the function
+const categories: Categories = categoriesData as Categories;
 
 export const handler: Handler = async (event) => {
   // CORS headers

@@ -1,8 +1,7 @@
 
 import { Handler } from '@netlify/functions';
-import { readFileSync } from 'fs';
-import { join, dirname } from 'path';
-import { fileURLToPath } from 'url';
+import toolsData from '../../server/data/tools.json';
+import categoriesData from '../../server/data/categories.json';
 
 interface Tool {
   id: number;
@@ -24,48 +23,9 @@ interface Categories {
   platform: string[];
 }
 
-// Load data from JSON files with multiple fallback paths
-let tools: Tool[] = [];
-let categories: Categories = { primary: [], secondary: [], pricing: [], platform: [] };
-
-try {
-  // Try different paths where data might be located in Netlify environment
-  const possiblePaths = [
-    join(process.cwd(), 'data/tools.json'),              // After build copy
-    join(process.cwd(), 'server/data/tools.json'),       // Development
-    join(process.cwd(), '../../data/tools.json'),        // Netlify function context
-    join(process.cwd(), '../../server/data/tools.json'),
-    './data/tools.json',                                 // Relative path
-    '../../../data/tools.json',
-  ];
-
-  let toolsPath = '';
-  for (const path of possiblePaths) {
-    try {
-      const content = readFileSync(path, 'utf-8');
-      toolsPath = path;
-      tools = JSON.parse(content);
-      console.log(`Successfully loaded tools from: ${path}`);
-      break;
-    } catch {
-      continue;
-    }
-  }
-
-  if (toolsPath) {
-    const categoriesPath = toolsPath.replace('tools.json', 'categories.json');
-    try {
-      categories = JSON.parse(readFileSync(categoriesPath, 'utf-8'));
-      console.log(`Successfully loaded categories from: ${categoriesPath}`);
-    } catch (err) {
-      console.error('Error loading categories:', err);
-    }
-  } else {
-    console.error('Failed to load tools from any path. Tried:', possiblePaths);
-  }
-} catch (error) {
-  console.error('Error loading data files:', error);
-}
+// Import data directly - it will be bundled into the function
+const tools: Tool[] = toolsData as Tool[];
+const categories: Categories = categoriesData as Categories;
 
 export const handler: Handler = async (event) => {
   // CORS headers
@@ -86,23 +46,47 @@ export const handler: Handler = async (event) => {
   }
 
   try {
-    // Parse the path - handle both direct calls and rewrites
-    const path = event.path.replace('/.netlify/functions/tools', '').replace('/.netlify/functions/categories', '');
-
-    // GET /api/tools/:slug (single tool)
-    const slugMatch = path.match(/^\/([a-z0-9-]+)$/);
-    if (slugMatch) {
-      const slug = slugMatch[1];
+    // Log the event for debugging
+    console.log('Event path:', event.path);
+    console.log('Event pathParameters:', event.pathParameters);
+    console.log('Event queryStringParameters:', event.queryStringParameters);
+    
+    // Extract slug from multiple possible sources
+    // 1. Path parameters (Netlify's preferred method when using :slug in redirects)
+    let slug = event.pathParameters?.slug;
+    
+    // 2. Query string parameters (for legacy /api/tools?slug=xyz format)
+    if (!slug && event.queryStringParameters?.slug) {
+      slug = event.queryStringParameters.slug;
+    }
+    
+    // 3. Parse from path as fallback
+    if (!slug) {
+      const path = event.path
+        .replace('/.netlify/functions/tools', '')
+        .replace('/api/tools', '');
+      
+      // Match slug pattern: /slug-name
+      const slugMatch = path.match(/^\/([a-z0-9-]+)$/);
+      if (slugMatch) {
+        slug = slugMatch[1];
+      }
+    }
+    
+    // GET /api/tools/:slug or /api/tools?slug=xyz (single tool by slug)
+    if (slug) {
       const tool = tools.find((t) => t.slug === slug);
       
       if (!tool) {
+        console.log(`Tool not found for slug: ${slug}`);
         return {
           statusCode: 404,
           headers,
-          body: JSON.stringify({ error: 'Tool not found' }),
+          body: JSON.stringify({ error: 'Tool not found', slug }),
         };
       }
 
+      console.log(`Found tool: ${tool.name}`);
       return {
         statusCode: 200,
         headers,
