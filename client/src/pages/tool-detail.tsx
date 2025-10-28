@@ -1,12 +1,13 @@
 import { useRoute, Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { ArrowLeft, ExternalLink, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ToolCard } from "@/components/tool-card";
+import { findSimilarTools } from "@/lib/similarTools";
 import type { Tool } from "@shared/schema";
 
 export default function ToolDetail() {
@@ -23,20 +24,57 @@ export default function ToolDetail() {
     enabled: !!slug,
   });
 
-  const relatedParams = new URLSearchParams();
-  if (tool?.primary_category) relatedParams.append("primary_category", tool.primary_category);
-  relatedParams.append("limit", "4");
-  const relatedUrl = `/api/tools?${relatedParams.toString()}`;
+  // Fetch a large sample of tools for similarity matching
+  // We'll fetch tools from the same primary category plus a broader set
+  const similarityParams = new URLSearchParams();
+  if (tool?.primary_category) {
+    similarityParams.append("primary_category", tool.primary_category);
+  }
+  similarityParams.append("limit", "100"); // Get 100 tools for better matching
+  const similarityUrl = `/api/tools?${similarityParams.toString()}`;
 
-  const { data: relatedToolsData } = useQuery<{
+  const { data: toolsForSimilarity } = useQuery<{
     tools: Tool[];
     total: number;
     page: number;
     totalPages: number;
   }>({
-    queryKey: [relatedUrl],
+    queryKey: [similarityUrl],
     enabled: !!tool,
   });
+
+  // Also fetch a general set of tools for cross-category matching
+  const generalParams = new URLSearchParams();
+  generalParams.append("limit", "200"); // Get 200 random tools
+  const generalUrl = `/api/tools?${generalParams.toString()}`;
+
+  const { data: generalToolsData } = useQuery<{
+    tools: Tool[];
+    total: number;
+    page: number;
+    totalPages: number;
+  }>({
+    queryKey: [generalUrl],
+    enabled: !!tool,
+  });
+
+  // Calculate similar tools using our sophisticated algorithm
+  const similarTools = useMemo(() => {
+    if (!tool || (!toolsForSimilarity && !generalToolsData)) return [];
+
+    // Combine tools from both queries, removing duplicates
+    const allAvailableTools = [
+      ...(toolsForSimilarity?.tools || []),
+      ...(generalToolsData?.tools || []),
+    ];
+
+    // Remove duplicates by id
+    const uniqueTools = Array.from(
+      new Map(allAvailableTools.map((t) => [t.id, t])).values()
+    );
+
+    return findSimilarTools(tool, uniqueTools, 6);
+  }, [tool, toolsForSimilarity, generalToolsData]);
 
   if (isLoading) {
     return (
@@ -220,27 +258,46 @@ export default function ToolDetail() {
               </CardContent>
             </Card>
 
-            {/* Related Tools */}
-            {relatedToolsData && relatedToolsData.tools.length > 0 && (
+            {/* Similar Tools - Intelligently matched */}
+            {similarTools && similarTools.length > 0 && (
               <Card>
                 <CardHeader>
                   <CardTitle className="text-lg">Similar Tools</CardTitle>
-                  <CardDescription>More from {tool.primary_category}</CardDescription>
+                  <CardDescription>
+                    Intelligently suggested based on category, features, and use cases
+                  </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  {relatedToolsData.tools
-                    .filter((t) => t.id !== tool.id)
-                    .slice(0, 3)
-                    .map((relatedTool) => (
-                      <Link key={relatedTool.id} href={`/tool/${relatedTool.slug}`} asChild>
-                        <a className="block hover-elevate active-elevate-2 rounded-lg p-3 border transition-all">
-                          <h4 className="font-semibold mb-1 line-clamp-1">{relatedTool.name}</h4>
-                          <p className="text-sm text-muted-foreground line-clamp-2">
-                            {relatedTool.short_description}
-                          </p>
-                        </a>
-                      </Link>
-                    ))}
+                <CardContent className="space-y-3">
+                  {similarTools.map((similarTool) => (
+                    <Link key={similarTool.id} href={`/tool/${similarTool.slug}`} asChild>
+                      <a
+                        className="block hover-elevate active-elevate-2 rounded-lg p-3 border transition-all"
+                        data-testid={`similar-tool-${similarTool.slug}`}
+                      >
+                        <div className="flex items-start justify-between gap-2 mb-1">
+                          <h4 className="font-semibold line-clamp-1 flex-1">
+                            {similarTool.name}
+                          </h4>
+                          <Badge
+                            variant="outline"
+                            className="text-xs shrink-0"
+                          >
+                            {similarTool.pricing}
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-muted-foreground line-clamp-2">
+                          {similarTool.short_description}
+                        </p>
+                        <div className="flex gap-1 mt-2 flex-wrap">
+                          {similarTool.primary_category && (
+                            <Badge variant="secondary" className="text-xs">
+                              {similarTool.primary_category}
+                            </Badge>
+                          )}
+                        </div>
+                      </a>
+                    </Link>
+                  ))}
                 </CardContent>
               </Card>
             )}
