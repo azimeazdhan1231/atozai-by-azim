@@ -19,15 +19,23 @@
   status = 200
 
 [[redirects]]
+  from = "/api/search"
+  to = "/.netlify/functions/tools"
+  status = 200
+  query = {q = ":q"}
+
+[[redirects]]
   from = "/api/tools/:slug"
   to = "/.netlify/functions/tools/:slug"
   status = 200
+  force = true
 
 [[redirects]]
   from = "/api/tools"
   to = "/.netlify/functions/tools"
   status = 200
 
+# SPA routing - must be last
 [[redirects]]
   from = "/*"
   to = "/index.html"

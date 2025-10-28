@@ -1,0 +1,9 @@
+# API redirects to Netlify functions
+/api/categories  /.netlify/functions/categories  200
+/api/agents      /.netlify/functions/agents      200
+/api/contact     /.netlify/functions/contact     200
+/api/tools/*     /.netlify/functions/tools/:splat  200
+/api/tools       /.netlify/functions/tools       200
+
+# SPA fallback - all other routes go to index.html
+/*  /index.html  200
